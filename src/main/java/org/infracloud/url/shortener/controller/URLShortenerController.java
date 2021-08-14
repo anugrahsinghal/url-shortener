@@ -21,12 +21,12 @@ public class URLShortenerController {
 	private final URLShortener urlShortenerService;
 
 	@PostMapping("/shorten")
-	public String convertToShortUrl(@RequestBody ShortenUrlRequest request) {
+	public String shortenURL(@RequestBody ShortenUrlRequest request) {
 		return urlShortenerService.shorten(request);
 	}
 
 	@GetMapping(value = "{shortLink}")
-	public RedirectView getAndRedirect(@PathVariable String shortLink) throws ShortLinkNotFoundException, ShortLinkExpiredException {
+	public RedirectView resolveAndRedirect(@PathVariable String shortLink) throws ShortLinkNotFoundException, ShortLinkExpiredException {
 		String originalURL = urlShortenerService.resolveOriginalURL(shortLink);
 
 		return new RedirectView(originalURL);
