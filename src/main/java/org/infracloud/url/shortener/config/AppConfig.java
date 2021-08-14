@@ -3,12 +3,15 @@ package org.infracloud.url.shortener.config;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-// @EnableScheduling
-@EnableJpaRepositories("org.infracloud.url.shortener.repository")
+@EnableCaching
 @Configuration
 public class AppConfig {
 
@@ -22,5 +25,16 @@ public class AppConfig {
 		return new Hibernate5Module();
 	}
 
+	@Bean
+	public Caffeine caffeineConfig() {
+		return Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES);
+	}
+
+	@Bean
+	public CacheManager cacheManager(Caffeine caffeine) {
+		CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+		caffeineCacheManager.setCaffeine(caffeine);
+		return caffeineCacheManager;
+	}
 
 }
