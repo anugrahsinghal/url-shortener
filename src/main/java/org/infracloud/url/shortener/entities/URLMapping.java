@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,8 @@ import org.hibernate.validator.constraints.URL;
 public class URLMapping {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name = "url_seq_gen", sequenceName = "url_id_sequence", initialValue = 100000)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "url_seq_gen")
 	private long id;
 
 	@URL
@@ -29,6 +31,8 @@ public class URLMapping {
 
 	@Column(nullable = false)
 	private Instant creationTime;
+
+	private Instant expirationTime;
 
 	public URLMapping(String longUrl) {
 		this.longUrl = longUrl;
