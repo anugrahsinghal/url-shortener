@@ -44,7 +44,7 @@ docker run -d -p 8080:8080 infracloud
     }'
     ```
 
-1. Get All Checks 
+1. Goto Long URL
     ```shell
     curl --location --request GET 'http://localhost:8080/{shortLink}'
     ```
