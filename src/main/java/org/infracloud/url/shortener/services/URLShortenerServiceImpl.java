@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.infracloud.url.shortener.dto.ShortenUrlRequest;
 import org.infracloud.url.shortener.entities.URLMapping;
+import org.infracloud.url.shortener.excpetions.InvalidExpirationException;
 import org.infracloud.url.shortener.excpetions.ShortLinkExpiredException;
 import org.infracloud.url.shortener.excpetions.ShortLinkNotFoundException;
 import org.infracloud.url.shortener.repository.URLMappingRepository;
@@ -18,11 +19,13 @@ public class URLShortenerServiceImpl implements URLShortener {
 
 	private final URLConvertor convertor;
 	private final URLMappingRepository urlMappingRepository;
+	private final ExpiryValidationStrategy expiryValidation;
 
-	public String shorten(ShortenUrlRequest request) {
+	public String shorten(ShortenUrlRequest request) throws InvalidExpirationException {
 		final URLMapping url = new URLMapping(request.getLongUrl());
 
 		if (request.getExpiry() != null) {
+			expiryValidation.validate(request.getExpiry());
 			url.setExpirationTime(request.getExpiry());
 		}
 
@@ -31,10 +34,11 @@ public class URLShortenerServiceImpl implements URLShortener {
 		return convertor.encode(entity.getId());
 	}
 
-	public String resolveOriginalURL(String shortUrl) throws ShortLinkNotFoundException, ShortLinkExpiredException {
-		long id = convertor.decode(shortUrl);
 
-		log.debug("Finding Long URL for {} by decoded Id {}", shortUrl, id);
+	public String resolveOriginalURL(String shortLink) throws ShortLinkNotFoundException, ShortLinkExpiredException {
+		long id = convertor.decode(shortLink);
+
+		log.debug("Finding Long URL for {} by decoded Id {}", shortLink, id);
 
 		URLMapping entity = urlMappingRepository.findById(id)
 				.orElseThrow(
@@ -42,7 +46,7 @@ public class URLShortenerServiceImpl implements URLShortener {
 				);
 
 		if (entity.getExpirationTime() != null && entity.getExpirationTime().isBefore(Instant.now())) {
-			log.debug("URL expired {}", shortUrl);
+			log.debug("URL expired {}", shortLink);
 			urlMappingRepository.delete(entity);
 			throw new ShortLinkExpiredException("The Short Link has expired!");
 		}

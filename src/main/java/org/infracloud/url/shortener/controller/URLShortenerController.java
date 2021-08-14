@@ -3,6 +3,7 @@ package org.infracloud.url.shortener.controller;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.infracloud.url.shortener.dto.ShortenUrlRequest;
+import org.infracloud.url.shortener.excpetions.InvalidExpirationException;
 import org.infracloud.url.shortener.excpetions.ShortLinkExpiredException;
 import org.infracloud.url.shortener.excpetions.ShortLinkNotFoundException;
 import org.infracloud.url.shortener.services.URLShortener;
@@ -24,7 +25,7 @@ public class URLShortenerController {
 	private final URLShortener urlShortenerService;
 
 	@PostMapping("/shorten")
-	public String shortenURL(@RequestBody @Valid ShortenUrlRequest request) {
+	public String shortenURL(@RequestBody @Valid ShortenUrlRequest request) throws InvalidExpirationException {
 		return urlShortenerService.shorten(request);
 	}
 

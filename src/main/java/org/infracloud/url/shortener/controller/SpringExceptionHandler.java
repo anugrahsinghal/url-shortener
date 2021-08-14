@@ -2,7 +2,7 @@ package org.infracloud.url.shortener.controller;
 
 import lombok.extern.log4j.Log4j2;
 import org.infracloud.url.shortener.dto.ExceptionWrapper;
-import org.infracloud.url.shortener.excpetions.ShortLinkExpiredException;
+import org.infracloud.url.shortener.excpetions.InvalidExpirationException;
 import org.infracloud.url.shortener.excpetions.ShortLinkNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class SpringExceptionHandler {
 		return getResponse(ex, HttpStatus.NOT_FOUND);
 	}
 
-	@ExceptionHandler( {Exception.class})
+	@ExceptionHandler( {InvalidExpirationException.class, Exception.class,})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<ExceptionWrapper> handleBadRequests(Exception ex) {
 		return getResponse(ex, HttpStatus.BAD_REQUEST);
