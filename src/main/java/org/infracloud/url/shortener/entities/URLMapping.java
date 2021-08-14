@@ -6,7 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +20,9 @@ import org.hibernate.validator.constraints.URL;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+// indexing this column since we have requirement to return same short URL for already present long url
+// thus indexing this column will help us figure out the values
+@Table(indexes = @Index(columnList = "long_url"))
 public class URLMapping {
 
 	@Id
@@ -26,7 +31,7 @@ public class URLMapping {
 	private long id;
 
 	@URL
-	@Column(nullable = false)
+	@Column(nullable = false, name = "long_url")
 	private String longUrl;
 
 	@Column(nullable = false)
